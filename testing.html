@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Refresh" content="600"> 
+	
+	<title>Haywards Heath air pollution tracker</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
+
+
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+
+<script>
+
+var greyIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png',
+  shadowUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+
+var blueIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+  shadowUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+
+var greenIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+  shadowUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+var yellowIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-yellow.png',
+  shadowUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+
+var orangeIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-orange.png',
+  shadowUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+
+var redIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+  shadowUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+
+</script>
+
+<h2>
+<font face="Arial" >
+<center>
+Live Air Pollution Tracker
+</center>
+</font>
+</h2>
+
+
+<font face="Arial" >
+Select an icon on the map to see data for that location:
+</font>
+
+	
+</head>
+<body>
+
+<style style="text/css">
+  	.hoverTable{
+		width:100%; 
+		border-collapse:collapse; 
+	}
+
+	/* Define the default color for all the table rows */
+	.hoverTable tr{
+		background: #FFFFFF;
+	}
+	/* Define the hover highlight color for the table row */
+    .hoverTable tr:hover {
+          background-color: #E2A9F3;
+    }
+</style>
+
+
+<div style="width: 100%; display: table;">
+<div style="display: table-row">
+<div id="mapid" style="width: 800px; height: 300px; display: table-cell; td-padding: 15px;"></div>
+
+<div id="icon_names" ="width: 500px; height: 300px; display: table-cell;"">
+<font size="2" face="Arial" >
+<table class="hoverTable"> <center> <b><u>Air Quality Rating (<a href="https://help.atmotube.com/faq/6-pm-standards/">AQI</a> /
+<a href="https://help.atmotube.com/faq/5-iaq-standards/">IAQ<a>)
+</u></b></center>
+  <tr>
+    <th>Icon &emsp; </th>
+    <th>Pollution &emsp; <br> levels &emsp; </th>
+    <th>PM2.5 &emsp; <br> μg/m³ &emsp;</th>
+    <th>PM10 &emsp; <br> μg/m³ &emsp;</th>
+    <th>VOC &emsp; <br> ppm &emsp;</th>
+  </tr>
+  <tr>
+    <td><img src="markers/marker-icon-red.png"></td>
+    <td>Very high</td>
+    <td>> 110</td>
+    <td>> 240</td>
+    <td>> 2.2</td>
+  </tr>
+  <tr>
+    <td><img src="markers/marker-icon-orange.png"></td>
+    <td>High</td>
+    <td>55 - 110</td>
+    <td>90 - 180</td>
+    <td>0.66 - 2.2</td>
+  </tr>
+  <tr>
+    <td><img src="markers/marker-icon-yellow.png"></td>
+    <td>Medium</td>
+    <td>33 - 55</td>
+    <td>50 - 90</td>
+    <td>0.22 - 0.66</td>
+  </tr>
+  <tr>
+    <td><img src="markers/marker-icon-green.png"></td>
+    <td>Low</td>
+    <td>15 - 30</td>
+    <td>25 - 50</td>
+    <td>0.065 - 0.22</td>
+  </tr>
+  <tr>
+    <td><img src="markers/marker-icon-blue.png"></td>
+    <td>Very Low</td>
+    <td>0 - 15</td>
+    <td>0 - 25</td>
+    <td>0 - 0.065</td>
+  </tr>
+  <tr>
+    <td><img src="markers/marker-icon-grey.png"></td>
+    <td>No Data</td>
+    <td>N/A</td>
+    <td>N/A</td>
+    <td>N/A</td>
+  </tr>
+</table>
+</font>
+</div>
+    </div>
+</div>
+
+<div id="myDiv" style="width:800px;height:400px;display: none;"></div>
+
+<script src="atmotube_data.js" type="text/javascript"></script>
+
+<script>
+
+
+
+var mymap = L.map('mapid').setView([51.000, -0.108], 14);
+
+L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+	maxZoom: 18,
+	attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+			'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+			'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+	id: 'mapbox/streets-v11',
+	tileSize: 512,
+	zoomOffset: -1
+}).addTo(mymap);
+
+
+customMarker = L.Marker.extend({
+   options: { 
+      x_axis: [0,1,2,3],
+      pm1:    [0,1,2,3],
+      pm25:   [0,1,2,3],
+      pm10:   [0,1,2,3],
+      VOC:    [0,1,2,3],
+      temp:   [0,1,2,3],
+      hum:    [0,1,2,3]
+   }
+});
+
+for (var i = 0; i < atmoData.length; i++) {
+
+	var newMarker =  new customMarker(atmoData[i].geometry.coordinates, {icon: atmoData[i].properties.icon, x_axis: atmoData[i].properties.x_axis, pm1: atmoData[i].properties.pm1, pm25: atmoData[i].properties.pm25, pm10: atmoData[i].properties.pm10, VOC: atmoData[i].properties.VOC, temp: atmoData[i].properties.temp, hum: atmoData[i].properties.hum, press: atmoData[i].properties.press })
+	console.log(newMarker)
+	newMarker.addTo(mymap)
+	newMarker.bindPopup(atmoData[i].properties.message)
+	newMarker.on('click', this.updatePlot, this);
+	newMarker.on('click', this.toggle_div, this);
+
+}
+
+
+
+var data = [ trace1, trace2, trace3, trace4]; //, trace5, trace6, trace7 ];
+
+
+var layout = {
+   title:'Pollution levels at selected site (past 24 hours)',
+   xaxis: { title: 'time of reading',range:[timepast,timenow]},
+   yaxis: { title: 'μg/m³', domain: [0.5,1.0]},
+   grid: { rows: 2, columns: 1, subplots: ['xy','xy2']}, //,'xy3','xy4','xy5'] },
+      yaxis2: {title: 'ppm', domain: [0.0,0.5]}
+      // yaxis3: {title: '°C', domain: [0.5,0.33]},
+      // yaxis4: {title: '%', domain: [0.33,0.167]},
+      // yaxis5: {title: 'mBar', domain: [0.167,0]}
+};
+
+
+Plotly.newPlot('myDiv', data, layout);
+
+
+function updatePlot(e)
+{ 
+    var t1 = { x: e.target.options.x_axis,
+	       y: e.target.options.pm1,
+	       mode: 'lines+markers',
+	       xaxis: 'x',
+	       yaxis: 'y1',
+	       name: 'PM1'};
+    var t2 = { x: e.target.options.x_axis,
+	       y: e.target.options.pm25,
+	       yaxis: 'y1',
+	       xaxis: 'x',
+	       mode: 'lines+markers',
+	       name: 'PM2.5'};
+    var t3 = { x: e.target.options.x_axis,
+	       y: e.target.options.pm10,
+	       yaxis: 'y1',
+	       xaxis: 'x',
+	       mode: 'lines+markers',
+	       name: 'PM10'};
+    var t4 = { x: e.target.options.x_axis,
+	       y: e.target.options.VOC,
+	       yaxis: 'y2',
+	       xaxis: 'x',
+	       mode: 'lines+markers',
+	       name: 'VOC'};
+    var t5 = { x: e.target.options.x_axis,
+	       y: e.target.options.temp,
+	       yaxis: 'y3',
+	       xaxis: 'x',
+	       mode: 'lines+markers',
+	       name: 'Temperature'};
+    var t6 = { x: e.target.options.x_axis,
+	       y: e.target.options.hum,
+	       yaxis: 'y4',
+	       xaxis: 'x',
+	       mode: 'lines+markers',
+	       name: 'Humidity'};
+    var t7 = { x: e.target.options.x_axis,
+	       y: e.target.options.press,
+	       yaxis: 'y5',
+	       xaxis: 'x',
+	       mode: 'lines+markers',
+	       name: 'Pressure'};
+    var data_update = [ t1, t2, t3, t4]; //, t5, t6, t7 ];
+    var layout_update = {
+      title:'Pollution levels at selected site (past 24 hours)',
+      xaxis: { title: 'time of reading',range:[timepast,timenow]},
+      yaxis: { title: 'μg/m³', domain: [0.5,1]},
+      grid: { rows: 2, columns: 1, subplots: ['xy','xy2']}, //,'xy3','xy4','xy5'] },
+         yaxis2: {title: 'ppm', domain: [0.,0.5]}
+         // yaxis3: {title: '°C', domain: [0.2,0.3]},
+         // yaxis4: {title: '%', domain: [0.1,0.2]},
+         // yaxis5: {title: 'mbar', domain: [0,0.1]}
+    };
+    Plotly.newPlot('myDiv', data_update, layout_update);
+
+}
+
+function toggle_div(e) {
+   console.log(e.target._events.preclick.length)
+
+   var divelement = document.getElementById('myDiv');
+
+   if(e.target._events.preclick.length == 1){
+      divelement.style.display = 'block';
+      }
+   else{
+      divelement.style.display = 'none';
+      }
+
+  }
+
+
+</script>
+
+
+
+
+</body>
+</html>

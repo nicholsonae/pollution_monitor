@@ -1,0 +1,1 @@
+0 #set to 0 to activate shutdowns for power saving
